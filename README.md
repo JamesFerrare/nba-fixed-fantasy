@@ -1,6 +1,6 @@
 # Locked In: NBA salary-cap fantasy
 
-A season-long NBA fantasy game for friends. Everyone gets **$500** to buy **15 players**, with
+A season-long NBA fantasy game for friends. Everyone gets **$750** to buy **15 players**, with
 prices set from consensus preseason fantasy rankings. Rosters lock once and never change.
 
 Every week is **all-against-all**: teams are ranked by the total fantasy points their players scored
@@ -58,7 +58,7 @@ Everything lives in `assets/config.js`:
 | Setting | What it does |
 | --- | --- |
 | `lockAt` | When signups close. Only games tipping off after this count. **Also change it in `supabase/setup.sql` and re-run that file.** |
-| `budget`, `rosterSize` | $500 and 15 players by default (also hard-coded as checks in `setup.sql`) |
+| `budget`, `rosterSize` | $750 and 15 players by default (also enforced in `setup.sql`; change both and re-run it) |
 | `weeklyPoints` | `null` = all-play (1 league point per team you outscore each week). Or a custom table by finish, e.g. `[12, 9, 7, 5, 4, 3, 2, 1]`. |
 | `scoring` | Fantasy points per stat. Change before the lock. Standings are always recomputed from raw box scores, so a change applies to the whole season. Then run `python scripts/build_prices.py --projections-only` so the roster builder's projections match (prices stay frozen). |
 

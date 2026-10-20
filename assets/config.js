@@ -1,10 +1,10 @@
 // League settings. This is the only file you should need to edit.
 window.LEAGUE = {
   name: "Locked In",
-  tagline: "15 players. $500. No trades, no waivers, no excuses.",
+  tagline: "15 players. $750. No trades, no waivers, no excuses.",
   season: "2026-27",
 
-  budget: 500,
+  budget: 750,
   rosterSize: 15,
 
   // Weekly all-play: every week each team is ranked by the fantasy points its

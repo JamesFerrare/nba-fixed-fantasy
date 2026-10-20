@@ -15,9 +15,18 @@ create table if not exists public.entries (
   owner_name  text not null check (char_length(btrim(owner_name)) between 1 and 40),
   team_name   text not null check (char_length(btrim(team_name)) between 1 and 40),
   email       text check (email is null or char_length(email) <= 200),
-  players     integer[] not null check (cardinality(players) = 15 and public.int_array_is_distinct(players)),
-  total_cost  integer not null check (total_cost between 0 and 500)
+  players     integer[] not null,
+  total_cost  integer not null
 );
+
+-- Roster size and budget. Keep in sync with rosterSize / budget in assets/config.js;
+-- re-running this file updates them on an existing table.
+alter table public.entries drop constraint if exists entries_players_check;
+alter table public.entries add constraint entries_players_check
+  check (cardinality(players) = 15 and public.int_array_is_distinct(players));
+alter table public.entries drop constraint if exists entries_total_cost_check;
+alter table public.entries add constraint entries_total_cost_check
+  check (total_cost between 0 and 750);
 
 create unique index if not exists entries_team_name_key on public.entries (lower(btrim(team_name)));
 
