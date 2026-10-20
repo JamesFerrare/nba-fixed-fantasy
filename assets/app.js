@@ -32,6 +32,7 @@
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } },
+    remove(k) { try { localStorage.removeItem(k); } catch { /* private mode */ } },
   };
 
   function ago(iso) {
@@ -115,10 +116,20 @@
       try {
         state.entries = await (await sb("rpc/league_entries", { method: "POST", body: "{}" })).json();
         state.entriesSource = "live";
+        forgetDeletedEntry();
       } catch (e) {
         state.entriesError = e.message;
       }
     }
+  }
+
+  // If the commissioner deleted this device's team, forget it so its owner
+  // starts from a clean slate instead of seeing "you already entered".
+  function forgetDeletedEntry() {
+    const mine = store.get(KEYS.mine, null);
+    if (!mine?.team) return;
+    const name = mine.team.trim().toLowerCase();
+    if (!state.entries.some((e) => e.team_name.trim().toLowerCase() === name)) store.remove(KEYS.mine);
   }
 
   // ------------------------------------------------------------------ scoring
