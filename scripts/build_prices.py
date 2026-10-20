@@ -224,7 +224,7 @@ def price_curve(season_fp):
     `season_fp` is each pool player's expected season fantasy points, in
     consensus-rank order. We fit a smooth decreasing curve of production vs
     rank, fp(r) = a + b*ln(r) + c*r, and make price linear in that curve.
-    Linear pricing means a full $1000 roster has about the same expected
+    Linear pricing means a full-budget roster has about the same expected
     total whether you buy stars or depth -- the game is finding players who
     beat their price, not exploiting the curve.
     """

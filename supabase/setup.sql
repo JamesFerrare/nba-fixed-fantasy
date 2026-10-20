@@ -16,7 +16,7 @@ create table if not exists public.entries (
   team_name   text not null check (char_length(btrim(team_name)) between 1 and 40),
   email       text check (email is null or char_length(email) <= 200),
   players     integer[] not null check (cardinality(players) = 15 and public.int_array_is_distinct(players)),
-  total_cost  integer not null check (total_cost between 0 and 1000)
+  total_cost  integer not null check (total_cost between 0 and 500)
 );
 
 create unique index if not exists entries_team_name_key on public.entries (lower(btrim(team_name)));
