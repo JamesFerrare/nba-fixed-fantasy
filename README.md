@@ -60,7 +60,7 @@ Everything lives in `assets/config.js`:
 | `lockAt` | When signups close. Only games tipping off after this count. **Also change it in `supabase/setup.sql` and re-run that file.** |
 | `budget`, `rosterSize` | $500 and 15 players by default (also hard-coded as checks in `setup.sql`) |
 | `weeklyPoints` | `null` = all-play (1 league point per team you outscore each week). Or a custom table by finish, e.g. `[12, 9, 7, 5, 4, 3, 2, 1]`. |
-| `scoring` | Fantasy points per stat. Change before the lock. Standings are always recomputed from raw box scores, so a change applies to the whole season. |
+| `scoring` | Fantasy points per stat. Change before the lock. Standings are always recomputed from raw box scores, so a change applies to the whole season. Then run `python scripts/build_prices.py --projections-only` so the roster builder's projections match (prices stay frozen). |
 
 ## How weeks work
 

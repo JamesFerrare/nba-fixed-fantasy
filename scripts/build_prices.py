@@ -4,6 +4,11 @@ Run once before the season (prices are frozen after that):
 
     python scripts/build_prices.py
 
+After people have picked, change scoring with --projections-only: it refreshes
+the projected points shown on the roster builder and leaves every price alone.
+
+    python scripts/build_prices.py --projections-only
+
 Sources (each gives a rank; we average them into a consensus rank):
   - ESPN points-league rank      (ESPN fantasy API, "STANDARD")
   - ESPN categories rank         (ESPN fantasy API, "ROTO")
@@ -208,7 +213,7 @@ def fantasy_points(avg, last=None):
         oreb = reb * (lo / lr if lr > 0 else 0.22)
     dd, td = h(37), h(38)
     return (
-        g(0) * 1 + oreb * 2 + (reb - oreb) * 1 + g(3) * 1.5 + g(2) * 3 + g(1) * 3 + g(11) * -2 + g(17) * 0.5
+        g(0) * 1 + oreb * 2 + (reb - oreb) * 1 + g(3) * 2 + g(2) * 3 + g(1) * 3 + g(11) * -2 + g(17) * 0.5
         + (dd - td) * 5 + td * 10 + h(10) * 5 + h(8) * 5 + h(7) * 20 + h(12) * 5
     )
 
@@ -345,5 +350,26 @@ def main():
     print("top 15 cost:", sum(p["price"] for p in players[:15]))
 
 
+def refresh_projections():
+    """Recompute projFpg / lastFpg under the current scoring; prices untouched."""
+    path = DATA / "players.json"
+    data = json.loads(path.read_text())
+    espn = {p["id"]: p for p in fetch_espn()}
+    changed = 0
+    for pl in data["players"]:
+        p = espn.get(pl["id"])
+        if not p:
+            continue
+        last_gp = int(float(p["last"].get("42", 0) or 0)) if p["last"] else 0
+        proj = round(fantasy_points(p["proj"], p["last"]), 1) if p["proj"] else None
+        last = round(fantasy_points(p["last"]), 1) if p["last"] and last_gp else None
+        changed += (proj, last) != (pl.get("projFpg"), pl.get("lastFpg"))
+        pl["projFpg"], pl["lastFpg"] = proj, last
+    path.write_text(json.dumps(data, separators=(",", ":")))
+    print(f"refreshed projections for {changed} players; prices unchanged")
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+
+    refresh_projections() if "--projections-only" in sys.argv else main()

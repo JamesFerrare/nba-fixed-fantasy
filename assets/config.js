@@ -31,7 +31,7 @@ window.LEAGUE = {
     pts: 1,             // point scored
     oreb: 2,            // offensive rebound
     dreb: 1,            // defensive rebound
-    ast: 1.5,           // assist
+    ast: 2,             // assist
     stl: 3,             // steal
     blk: 3,             // block
     tov: -2,            // turnover
