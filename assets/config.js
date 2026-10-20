@@ -21,8 +21,8 @@ window.LEAGUE = {
 
   // From your Supabase project: Project Settings -> API (or "Connect").
   // The anon / publishable key is meant to be public, so it's fine to commit.
-  supabaseUrl: "",
-  supabaseKey: "",
+  supabaseUrl: "https://mqbjbbtkbtbzgmeotxji.supabase.co",
+  supabaseKey: "sb_publishable_x6uTl2qfIxwfcliKoAeLVw_TSjKFq6T",
 
   // Fantasy points per stat. If you change these before the season, also
   // update fantasy_points() in scripts/build_prices.py and re-run it so the
