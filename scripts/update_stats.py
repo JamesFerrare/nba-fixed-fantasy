@@ -72,21 +72,35 @@ def made_att(v):
 def parse_game(event_id, pool):
     sm = get_json(f"{ESPN}/summary", params={"event": event_id})
 
-    techs, flags, ejections = {}, {}, set()
+    # Foul events per player, keyed by the moment they happened. ESPN sometimes
+    # logs the same technical twice (new play id, same clock and wall time).
+    tech_events, flag_events, ejections = {}, {}, set()
     for play in sm.get("plays", []):
         kind = play.get("type", {}).get("text", "")
         ids = [to_int(p.get("athlete", {}).get("id")) for p in play.get("participants", [])]
         if not ids:
             continue
+        moment = (kind, play.get("period", {}).get("number"), play.get("clock", {}).get("displayValue"), play.get("wallclock"))
         if kind == "Ejection":
             ejections.add(ids[0])
         elif kind.startswith("Flagrant Foul"):
-            flags[ids[0]] = flags.get(ids[0], 0) + 1
+            flag_events.setdefault(ids[0], []).append(moment)
         elif "Technical" in kind and not kind.startswith("Free Throw") and "3-Second" not in kind and "Delay" not in kind:
             # A double technical charges everyone listed; otherwise the 2nd
             # participant is the player who drew it.
             for pid in (ids if kind.startswith("Double") else ids[:1]):
-                techs[pid] = techs.get(pid, 0) + 1
+                tech_events.setdefault(pid, []).append(moment)
+
+    for team in sm["boxscore"].get("players", []):
+        for a in team["statistics"][0]["athletes"]:
+            if a.get("ejected"):
+                ejections.add(to_int(a.get("athlete", {}).get("id")))
+
+    # Collapse same-moment repeats, unless the player really was ejected
+    # (two quick techs at once do happen, and they always end in an ejection).
+    def count(events):
+        return {pid: len(ev) if pid in ejections else len(set(ev)) for pid, ev in events.items()}
+    techs, flags = count(tech_events), count(flag_events)
 
     rows = []
     for team in sm["boxscore"].get("players", []):
