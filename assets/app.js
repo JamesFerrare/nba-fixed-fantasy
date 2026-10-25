@@ -289,7 +289,9 @@
     const now = rankBy("leaguePts", "fpDone");
     const before = rankBy("prevPts", "prevFp");
     for (const t of teams) { t.rank = now.get(t.id); t.move = done.length > 1 ? before.get(t.id) - t.rank : 0; }
-    teams.sort((a, b) => a.rank - b.rank || a.team_name.localeCompare(b.team_name));
+    // Until the first week is final everyone is tied on 0, so order by the live week.
+    const liveFp = (t) => (t.liveWeek ? t.liveWeek.fp : 0);
+    teams.sort((a, b) => a.rank - b.rank || liveFp(b) - liveFp(a) || a.team_name.localeCompare(b.team_name));
     return { weeks, done, dates, teams, invalid: all.filter((t) => !t.valid) };
   }
 
@@ -512,7 +514,7 @@
       const tot = totals.get(id);
       if (tot && (!topPlayer || tot.fp > topPlayer.fp)) topPlayer = { id, fp: tot.fp };
     }
-    const mostOwned = [...owned.entries()].sort((a, b) => b[1] - a[1])[0];
+    const mostOwned = [...owned.entries()].sort((a, b) => b[1] - a[1] || (state.byId.get(b[0])?.price || 0) - (state.byId.get(a[0])?.price || 0))[0];
     const leader = teams[0];
     const liveLeader = live && live.dates.length ? live.results[0] : null;
     const firstEnd = weeks[0] ? shortDate(addDays(weeks[0].end, 1)) : "";
@@ -521,7 +523,7 @@
     const record = (t) => `${t.w}-${t.l}${t.t ? `-${t.t}` : ""}`;
     const rows = teams.map((t) => `
       <tr class="clickable ${isMine(t) ? "mine" : ""}" data-team="${t.id}">
-        <td class="rank">${t.rank}${t.move > 0 ? `<span class="move up">▲${t.move}</span>` : t.move < 0 ? `<span class="move down">▼${-t.move}</span>` : ""}</td>
+        <td class="rank">${done.length ? t.rank : "–"}${t.move > 0 ? `<span class="move up">▲${t.move}</span>` : t.move < 0 ? `<span class="move down">▼${-t.move}</span>` : ""}</td>
         <td><div class="teamcell"><strong data-key>${keyFor(t)}${esc(t.team_name)}</strong><span>${esc(t.owner_name)}</span></div></td>
         <td class="num hide-sm">${t.liveWeek && live.dates.length ? `${fmt1(t.liveWeek.fp)} <span class="muted small">${ordinal(t.liveWeek.rank)}</span>` : "—"}</td>
         <td class="num hide-sm">${done.length ? record(t) : "—"}</td>
