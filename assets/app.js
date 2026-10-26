@@ -1122,7 +1122,7 @@
           </div>
           <div class="card prose">
             <h2>Stats</h2>
-            <p>Box scores come from ESPN and update every morning (about 5am ET), with a second pass midday for stat corrections. Last update: ${esc(ago(state.updated))}.</p>
+            <p>Box scores come from ESPN and update several times each morning (starting around 2am ET), with a midday pass for stat corrections. Last update: ${esc(ago(state.updated))}.</p>
           </div>
         </div>
       </div>`);

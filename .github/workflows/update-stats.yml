@@ -2,7 +2,11 @@ name: Update stats
 
 on:
   schedule:
-    - cron: "15 9 * * *"   # ~5am ET, after the late West Coast games
+    # GitHub often starts scheduled runs hours late, so there are several
+    # chances each morning to pick up the previous night's games.
+    - cron: "15 6 * * *"   # ~2am ET, after the late West Coast games
+    - cron: "15 9 * * *"   # ~5am ET
+    - cron: "15 12 * * *"  # ~8am ET
     - cron: "15 16 * * *"  # midday pass for stat corrections
   workflow_dispatch:
 
